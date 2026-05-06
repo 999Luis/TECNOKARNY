@@ -1,0 +1,68 @@
+@using System.Globalization
+@model IEnumerable<TECNOKARNY.Models.Productos>
+@{
+    var culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+    culture.NumberFormat.CurrencySymbol = "$";
+    ViewData["Title"] = "Productos";
+}
+<a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar</a>
+<table class="table table-hovered table-bordered">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Precio por Kilogramo</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tbody>
+            @foreach (Productos producto in Model)
+            {
+                <tr>
+                    <td>@producto.Nombre</td>
+                    <td>@String.Format(culture, "{0:C}", producto.PrecioKilo)</td>
+                    <td><a asp-route-id="@producto.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
+                    <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar" data-id="@producto.Id">Eliminar</button></td>
+                </tr>
+            }
+        </tbody>
+    </thead>
+</table>
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Desea eliminar este producto?
+            </div>
+            <div class="modal-footer">
+                <form asp-action="Eliminar" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="idProducto" value="">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const botones = document.querySelectorAll(".btnEliminar");
+        const txtId = document.getElementById("idProducto");
+        botones.forEach(btn => {
+            btn.addEventListener("click", function () {
+                const id = this.getAttribute("data-id");
+                txtId.value = id;
+            });
+        });
+    </script>
+}

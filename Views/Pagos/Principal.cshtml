@@ -1,0 +1,37 @@
+@using System.Globalization
+@model IEnumerable<TECNOKARNY.Models.Pagos>
+@{
+    var culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+    culture.NumberFormat.CurrencySymbol = "$";
+    ViewData["Title"] = "Pagos";
+}
+<a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar</a>
+<table class="table table-hovered table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Teléfono</th>
+            <th>Fecha de pago</th>
+            <th>Monto</th>
+            <th>Descripción</th>
+            <th>Usuario</th>
+            <th> </th>
+        </tr>
+        <tbody>
+            @foreach (Pagos pago in Model)
+            {
+                <tr>
+                    <td>@pago.Nombre</td>
+                    <td>@pago.Tipo</td>
+                    <td>@pago.Telefono</td>
+                    <td>@pago.FechaPago</td>
+                    <td>@String.Format(culture, "{0:C}", pago.Monto)</td>
+                    <td>@pago.Descripcion</td>
+                    <td>@pago.IdUsuarioNavigation.Nombre</td>
+                    <td><a asp-route-id="@pago.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
+                </tr>
+            }
+        </tbody>
+    </thead>
+</table>

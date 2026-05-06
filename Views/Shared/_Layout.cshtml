@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="~/images/LogoCarniceria.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TECNOKARNY </title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <header>
+
+        <nav class="navbar  fixed-top" style="background-color: #9a0000;" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-action="MenuInicio" asp-controller="Inicio">TECNOKARNY</a>
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                         aria-labelledby="offcanvasNavbarLabel">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" asp-controller="Usuarios"
+                                       asp-action="Principal">Usuarios</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="#">Ventas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" href="#">Cotizaciones</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" asp-controller="Productos"
+                                       asp-action="Principal">Productos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" asp-controller="Pagos"
+                                       asp-action="Principal">Pagos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" aria-current="page" asp-controller="Clientes"
+                                       asp-action="Principal">Clientes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" asp-action="CerrarSesion" asp-controller="Inicio">Cerrar
+                                        sesión</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                else
+                    {
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
+                                aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                            <div class="navbar-nav">
+                                <a class="nav-link active" aria-current="page" asp-action="Login"
+                                   asp-controller="Inicio">Iniciar Sesión</a>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </nav>
+        </header>
+        <div class="container">
+            <main role="main" class="pb-3">
+                <div style="margin-top: 60px;"></div>
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2026 - TECNOKARNY - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+
+</html>

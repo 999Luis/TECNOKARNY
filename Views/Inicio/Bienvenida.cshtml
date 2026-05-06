@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Bienvenida";
+}
+<div class="container-fluid">
+    <div class="row align-items-center min-vh-100">
+        <div class="col-lg-6 p-5">
+            @if (User.Identity!.IsAuthenticated){
+                <h1 class="display-4 fw-bold mb-4">
+                ¡Bienvenido @User.Identity.Name!
+            </h1>
+            } else {
+                <h1 class="display-4 fw-bold mb-4">
+                ¡Bienvenido a TECNOKARNY!
+            </h1>
+            }
+            <p class="lead text-muted">
+                Listo para administrar tu negocio
+            </p>
+            <hr class="my-4">
+            <ul class="list-group list-group-flush fs-5">
+                <li class="list-group-item">
+                    Control de presupuestos
+                </li>
+                <li class="list-group-item">
+                    Administración de ventas
+                </li>
+                <li class="list-group-item">
+                    Gestion de productos
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-6 text-center">
+            <img src="~/images/LogoCarniceria.png" class="img-fluid rounded shadow" alt="Logo carniceria">
+        </div>
+    </div>
+</div>

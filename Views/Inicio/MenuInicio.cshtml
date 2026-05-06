@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "Menú de Inicio";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-lg-9 p-2">
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <h1 class="display-5 fw-bold mb-4">
+                        ¡Bienvenido @User.Identity.Name! - Menú Principal
+                    </h1>
+                }
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                @if(User.IsInRole("Administrador")){
+                    <div class="col-md-4 mb-0">
+                    <div style="width: 16rem;">
+                        <a asp-action="Principal" asp-controller="Usuarios">
+                            <img src="~/images/Usuarios.png" class="card-img-top" alt="Logo Usuarios">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-0">
+                                        <div style="width: 16rem;">
+                                            <a asp-action="Principal" asp-controller="Productos">
+                                                <img src="~/images/Productos.png" class="card-img-top" alt="Logo Usuarios">
+                                                </a>
+                                            </div>
+                                        </div>
+                }
+                    <div class="col-md-4 mb-0">
+                        <div style="width: 16rem;">
+                            <a asp-action="Principal" asp-controller="Clientes">
+                                <img src="~/images/Clientes.png" class="card-img-top" alt="Logo Usuarios">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-0">
+                            <div style="width: 16rem;">
+                                <a asp-action="Principal" asp-controller="Ventas">
+                                    <img src="~/images/Ventas.png" class="card-img-top" alt="Logo Usuarios">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-0">
+                                <div style="width: 16rem;">
+                                    <a asp-action="Principal" asp-controller="Cotizaciones">
+                                        <img src="~/images/Cotizaciones.png" class="card-img-top" alt="Logo Usuarios">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-0">
+                                    <div style="width: 16rem;">
+                                        <a asp-action="Principal" asp-controller="Pagos">
+                                            <img src="~/images/Pagos.png" class="card-img-top" alt="Logo Usuarios">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </body>
+
+                        </html>
+

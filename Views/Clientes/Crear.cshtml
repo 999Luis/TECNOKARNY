@@ -1,0 +1,67 @@
+@model Clientes
+
+<form asp-action="Crear" method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="Nombre"></label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="ApePat"></label>
+                <input asp-for="ApePat" class="form-control" />
+                <span asp-validation-for="ApePat" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="ApeMat"></label>
+                <input asp-for="ApeMat" class="form-control" />
+                <span asp-validation-for="ApeMat" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="Telefono"></label>
+                <input asp-for="Telefono" class="form-control" type="phone"/>
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="Correo"></label>
+                <input asp-for="Correo" class="form-control" />
+                <span asp-validation-for="Correo" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div>
+                <label asp-for="Direccion"></label>
+                <input asp-for="Direccion" class="form-control" />
+                <span asp-validation-for="Direccion" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-action="Principal" class="btn btn-dark">Regresar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
