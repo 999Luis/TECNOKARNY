@@ -1,0 +1,118 @@
+CREATE DATABASE BDTECNOKARNY;
+GO
+USE BDTECNOKARNY;
+GO
+CREATE TABLE Roles (
+        Id TINYINT IDENTITY PRIMARY KEY,
+        Rol VARCHAR(13) NOT NULL
+    );
+
+CREATE TABLE Usuarios (
+        Id TINYINT IDENTITY PRIMARY KEY,
+        Nombre VARCHAR(50) NOT NULL,
+        Correo VARCHAR(100) UNIQUE NOT NULL,
+        Pwd VARCHAR(255) NOT NULL,
+        Estado VARCHAR(8) DEFAULT 'Activo' CHECK (Estado IN ('Activo', 'Inactivo')),
+        Id_Rol TINYINT NOT NULL,
+        CONSTRAINT fk_Usr_Rol FOREIGN KEY (Id_Rol)
+        REFERENCES Roles (Id)
+    );
+
+CREATE TABLE Clientes(
+    Id SMALLINT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    ApePat VARCHAR(50) NOT NULL,
+    ApeMat VARCHAR(50) NOT NULL,
+    Telefono VARCHAR(10) NOT NULL,
+    Correo VARCHAR(100) UNIQUE NOT NULL,
+    Direccion VARCHAR(100),
+);
+
+CREATE TABLE Cotizaciones(
+    Id SMALLINT IDENTITY PRIMARY KEY,
+    Fecha_Emision DATE NOT NULL,
+    Fecha_Evento DATE NOT NULL,
+    Hora TIME NOT NULL,
+    Direccion VARCHAR(100) NOT NULL,
+    Asistentes SMALLINT NOT NULL,
+    Anticipo BIT DEFAULT 0,
+    Estado_Cot VARCHAR(9) NOT NULL 
+    CHECK(Estado_Cot IN ('Vigente','Expirada','Confirmada','Finalizada')),
+    Saldo_Total DECIMAL(10,2) NOT NULL,
+    Id_Cliente SMALLINT NOT NULL,
+    Id_Usuario TINYINT NOT NULL,
+    CONSTRAINT fk_C_Cot FOREIGN KEY (Id_Cliente)
+    REFERENCES Clientes (Id),
+    CONSTRAINT fk_U_Cot FOREIGN KEY (Id_Usuario)
+    REFERENCES Usuarios (Id)
+);
+
+CREATE TABLE Productos(
+    Id SMALLINT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    Precio_Kilo DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Detalle_Cotizacion(
+    Id INT IDENTITY PRIMARY KEY,
+    Cantidad DECIMAL(10,2) NOT NULL,
+    Precio_Kilo DECIMAL(10,2) NOT NULL,
+    Precio_Cotizado DECIMAL(10,2) NOT NULL,
+    Id_Cotizacion SMALLINT NOT NULL,
+    Id_Producto SMALLINT NOT NULL,
+    CONSTRAINT fk_Cot_DetCot FOREIGN KEY (Id_Cotizacion)
+    REFERENCES Cotizaciones (Id),
+    CONSTRAINT fk_Prod_DetCot FOREIGN KEY (Id_Producto)
+    REFERENCES Productos (Id)
+);
+
+CREATE TABLE Ventas(
+    Id INT IDENTITY PRIMARY KEY,
+    Monto_Total DECIMAL(10,2) NOT NULL,
+    Fecha DATE NOT NULL,
+    Estado VARCHAR(9) DEFAULT 'Activa'
+    CHECK(Estado IN ('Activa','Cancelada')),
+    Motivo_Cancelacion VARCHAR(100),
+    Tipo VARCHAR(7) NOT NULL
+    CHECK(Tipo IN('Contado','Crédito')),
+    Saldo DECIMAL(10,2) NOT NULL,
+    Fecha_Vencimiento DATE,
+    Id_Cliente SMALLINT NOT NULL,
+    Id_Usuario TINYINT NOT NULL,
+    CONSTRAINT fk_C_V FOREIGN KEY (Id_Cliente)
+    REFERENCES Clientes (Id),
+    CONSTRAINT fk_U_V FOREIGN KEY (Id_Usuario)
+    REFERENCES Usuarios (Id)
+);
+
+CREATE TABLE Detalle_Venta(
+    Id INT IDENTITY PRIMARY KEY,
+    Cantidad DECIMAL(10,2) NOT NULL,
+    Precio_Kilo DECIMAL(10,2) NOT NULL,
+    Subtotal DECIMAL(10,2) NOT NULL,
+    Id_Venta INT NOT NULL,
+    Id_Producto SMALLINT NOT NULL,
+    CONSTRAINT fk_V_DetVent FOREIGN KEY (Id_Venta)
+    REFERENCES Ventas (Id),
+    CONSTRAINT fk_Prod_DetVent FOREIGN KEY (Id_Producto)
+    REFERENCES Productos (Id)
+);
+
+CREATE TABLE Pagos(
+    Id INT IDENTITY PRIMARY KEY,
+    Nombre VARCHAR(50) NOT NULL,
+    Tipo VARCHAR(50) NOT NULL
+    CHECK(Tipo IN('Materia Prima', 'Insumos', 'Servicios')),
+    Telefono VARCHAR(10),
+    Fecha_Pago DATE NOT NULL,
+    Monto DECIMAL(10,2) NOT NULL,
+    Descripcion VARCHAR(500),
+     Id_Usuario TINYINT NOT NULL,
+    CONSTRAINT fk_U_Pagos FOREIGN KEY (Id_Usuario)
+    REFERENCES Usuarios (Id)
+);
+
+INSERT INTO Roles (Rol)
+VALUES ('Administrador'),('Trabajador');
+
+SELECT @@SERVERNAME
