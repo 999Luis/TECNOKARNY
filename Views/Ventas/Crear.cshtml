@@ -1,0 +1,248 @@
+@using System.Security.Claims
+@model VentaViewModel
+
+<form asp-action="Crear" method="post" id="formVenta">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <label asp-for="IdCliente"></label>
+            <select asp-for="IdCliente" asp-items="ViewBag.Clientes" class="form-select" id="IdCliente" required>
+                <option value="">-- Seleccionar cliente --</option>
+            </select>
+            <span asp-validation-for="IdCliente" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Tipo"></label>
+            <select asp-for="Tipo" id="Tipo" class="form-select" required>
+                <option value="">-- Seleccionar tipo --</option>
+                <option value="Contado">Contado</option>
+                <option value="Crédito">Crédito</option>
+            </select>
+            <span asp-validation-for="Tipo" class="text-danger"></span>
+
+            <input asp-for="IdUsuario" type="hidden" value="@User.FindFirst(ClaimTypes.NameIdentifier)?.Value" />
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <label asp-for="Fecha"></label>
+            <input asp-for="Fecha" class="form-control" type="date" readonly />
+            <span asp-validation-for="Fecha" class="text-danger"></span>
+        </div>
+        <div class="col-md-4" id="divFechaVencimiento">
+            <label asp-for="FechaVencimiento"></label>
+            <input asp-for="FechaVencimiento" class="form-control" type="date" readonly />
+            <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+        </div>
+        <div class="col-md-4" id="divSaldo">
+            <input asp-for="Saldo" class="form-control" type="number" hidden />
+            <span asp-validation-for="Saldo" class="text-danger"></span>
+        </div>
+    </div>
+
+    <h5 class="mt-4 mb-3">Productos</h5>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered" id="tablaProductos">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad (Kg)</th>
+                    <th>Precio por Kilogramo</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="bodyProductos">
+                <tr id="filaVacia" class="text-center text-muted">
+                    <td colspan="5">Agrega los productos de la venta</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button type="button" class="btn mb-3" style="background-color: #9a0000; color: white;"
+            id="btnAgregarProducto">Agregar Producto</button>
+    <div class="row mt-3">
+        <div class="col-md-4" id="divCambio">
+            <label>Pago</label>
+            <input class="form-control" type="number" step="0.01" id="pago" placeholder="Ingrese el pago" min="0" />
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6><span id="tituloMontoTotal">Monto Total:</span><strong id="montoTotal">$0.00</strong></h6>
+                        <h6>Cambio: <strong id="cambio">$0.00</strong></h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input asp-for="MontoTotal" type="hidden" id="inputMontoTotal" />
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Guardar Venta</button>
+            <a asp-action="Principal" class="btn btn-dark">Regresar</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        const productosData = @Html.Raw(ViewBag.ProductosJSON);
+        let contadorFilas = 0;
+
+        document.getElementById("btnAgregarProducto").addEventListener("click", function () {
+            agregarFila();
+        });
+
+        document.getElementById("formVenta").addEventListener("submit", function (e) {
+            if (document.querySelectorAll("#bodyProductos tr:not(#filaVacia)").length === 0) {
+                e.preventDefault();
+                alert("Debe agregar al menos un producto.");
+                return false;
+            }
+        });
+
+        document.getElementById("Tipo").addEventListener("change", function () {
+            const divSaldo = document.getElementById("divSaldo");
+            const divFechaVencimiento = document.getElementById("divFechaVencimiento");
+            const divCambio = document.getElementById("divCambio");
+            const tituloMontoTotal = document.getElementById("tituloMontoTotal");
+
+            if (this.value === "Contado") {
+                divSaldo.style.display = "none";
+                divFechaVencimiento.style.display = "none";
+                divCambio.style.display = "block";
+                tituloMontoTotal.textContent = "Monto Total:";
+
+
+            } else {
+                divSaldo.style.display = "block";
+                divFechaVencimiento.style.display = "block";
+                divCambio.style.display = "none";
+                tituloMontoTotal.textContent = "Saldo:";
+            }
+
+        });
+
+        function agregarFila() {
+            const tbody = document.getElementById("bodyProductos");
+            const filaVacia = document.getElementById("filaVacia");
+            if (filaVacia) filaVacia.remove();
+
+            const fila = document.createElement("tr");
+            fila.id = "fila_" + contadorFilas;
+
+            fila.innerHTML = `
+                            <td>
+                                <select class="form-select productoSelect" name="DetallesVenta[${contadorFilas}].IdProducto" required>
+                                    <option value="">-- Seleccionar --</option>
+                                    ${productosData.map(p => `<option value="${p.Id}" data-precio="${p.PrecioKilo}">${p.Nombre}</option>`).join("")}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control cantidad" name="DetallesVenta[${contadorFilas}].Cantidad" step="0.01" value="1" min="0" required />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control precioKilo" name="DetallesVenta[${contadorFilas}].PrecioKilo" step="0.01" value="0" readonly />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control subtotal" name="DetallesVenta[${contadorFilas}].Subtotal" step="0.01" value="0" readonly />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm btnEliminarFila">Eliminar</button>
+                            </td>
+                        `;
+
+            tbody.appendChild(fila);
+
+            const selectProducto = fila.querySelector(".productoSelect");
+            const inputCantidad = fila.querySelector(".cantidad");
+            const inputPrecio = fila.querySelector(".precioKilo");
+            const inputSubtotal = fila.querySelector(".subtotal");
+
+            selectProducto.addEventListener("change", function () {
+                const option = this.options[this.selectedIndex];
+                const precio = parseFloat(option.dataset.precio) || 0;
+                inputPrecio.value = precio.toFixed(2);
+                calcularSubtotal(inputCantidad, inputPrecio, inputSubtotal);
+                calcularTotal();
+            });
+
+            inputCantidad.addEventListener("change", function () {
+                calcularSubtotal(inputCantidad, inputPrecio, inputSubtotal);
+                calcularTotal();
+            });
+
+            fila.querySelector(".btnEliminarFila").addEventListener("click", function () {
+                fila.remove();
+                if (document.querySelectorAll("#bodyProductos tr").length === 0) {
+                    tbody.innerHTML = '<tr id="filaVacia" class="text-center text-muted"><td colspan="5">Agregue productos haciendo clic en "Agregar Producto"</td></tr>';
+                }
+                calcularTotal();
+            });
+
+            contadorFilas++;
+        }
+
+        function calcularSubtotal(cantidad, precio, subtotal) {
+            const cant = parseFloat(cantidad.value) || 0;
+            const prec = parseFloat(precio.value) || 0;
+            const sub = cant * prec;
+            subtotal.value = sub.toFixed(2);
+        }
+
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll(".subtotal").forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById("montoTotal").textContent = "$" + total.toFixed(2);
+            document.getElementById("inputMontoTotal").value = total.toFixed(2);
+
+            if (document.getElementById("Tipo").value === "Crédito") {
+                document.querySelector("input[name='Saldo']").value = total.toFixed(2);
+            }
+        }
+
+        document.getElementById("pago").addEventListener("change", calcularCambio);
+
+        function calcularCambio() {
+            const pagoInput = document.getElementById("pago");
+            const pago = parseFloat(pagoInput.value) || 0;
+            const total = parseFloat(document.getElementById("inputMontoTotal").value) || 0;
+            const cambio = pago - total;
+            if (cambio < 0) {
+                alert("El pago es insuficiente.");
+                document.getElementById("cambio").textContent = "$0.00";
+                return;
+            }
+            document.getElementById("cambio").textContent = "$" + cambio.toFixed(2);
+        }
+
+        //Validar que el cliente no tenga deudas pendientes al seleccionar un cliente
+        document.getElementById("IdCliente").addEventListener("change", async function () {
+            const idCliente = this.value;
+            if (idCliente) {
+                const response = await fetch(`/Ventas/VerificarDeuda?idCliente=${idCliente}`);
+                const data = await response.json();
+
+                if (data && data.id > 0) {
+                    alert(`El cliente tiene un saldo pendiente de $${data.saldo.toFixed(2)}`);
+                    if (confirm("¿Ir a pagar el adeudo?")) {
+                        window.location.href = `/Ventas/Actualizar/${data.id}`;
+                    } else {
+                        this.value = "";
+                    }
+                }
+            }
+        });
+    </script>
+}

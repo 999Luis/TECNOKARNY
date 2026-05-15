@@ -65,5 +65,28 @@ namespace TECNOKARNY.Controllers
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }
+
+        public async Task<IActionResult> VentasCliente(short Id)
+        {
+            var cliente = await db.Clientes.FindAsync(Id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+            var ventas = await db.Ventas
+                .Include(v => v.IdClienteNavigation)
+                .Include(v => v.IdUsuarioNavigation)
+                .Include(v => v.DetalleVenta)
+                .Where(v => v.IdCliente == Id)
+                .ToListAsync();
+
+            ViewBag.NombreCliente = $"{cliente.Nombre} {cliente.ApePat} {cliente.ApeMat}";
+            return View("~/Views/Ventas/Principal.cshtml", ventas);
+        }
+
+        public async Task<IActionResult> DetalleVenta(int id)
+        {
+            return RedirectToAction("DetalleVenta", "Ventas", new { id });
+        }
     }
 } 

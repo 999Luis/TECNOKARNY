@@ -4,6 +4,7 @@
     ViewData["Title"] = "Clientes";
 }
 <a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar</a>
+<a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary mt-4 mb-4" style="background-color: #9a0000;">Inicio</a>
 <table class="table table-hovered table-bordered">
     <thead>
         <tr>
@@ -13,8 +14,10 @@
             <th>Teléfono</th>
             <th>Correo</th>
             <th>Dirección</th>
-            <th></th>
-            <th></th>
+            <th>Compras</th>
+            <th>Cotizaciones</th>
+            <th>Actualizar</th>
+            <th>Eliminar</th>
         </tr>
         <tbody>
             @foreach (Clientes cliente in Model)
@@ -26,6 +29,8 @@
                     <td>@cliente.Telefono</td>
                     <td>@cliente.Correo</td>
                     <td>@cliente.Direccion</td>
+                    <td><a asp-action="VentasCliente" asp-route-id="@cliente.Id" class="btn btn-primary">Ver</a></td>
+                    <td></td>
                     <td><a asp-route-id="@cliente.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
                     <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
                             data-bs-target="#modalEliminar" data-id="@cliente.Id">Eliminar</button></td>

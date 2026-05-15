@@ -1,0 +1,134 @@
+@using System.Globalization
+@model IEnumerable<TECNOKARNY.Models.Ventas>
+@{
+    ViewData["Title"] = "Ventas";
+}
+@if(ViewBag.NombreCliente != null)
+{
+    <h2 class="mt-4">Ventas: <strong>@ViewBag.NombreCliente</strong></h2>
+    <a asp-controller="Clientes" asp-action="Principal" class="btn btn-dark mt-4 mb-4">Regresar</a>
+} else
+{
+    <a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar venta</a>
+    <a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary mt-4 mb-4" style="background-color: #9a0000;">Inicio</a>
+}
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Cliente</th>
+            <th>Usuario</th>
+            <th>Monto Total</th>
+            <th>Saldo</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Actualizar</th>
+            <th>Cancelar</th>
+            <th>Pagar</th>
+            <th>Ver Detalles</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var venta in Model)
+        {
+            <tr>
+                <td>@venta.Id</td>
+                <td>@venta.IdClienteNavigation?.Nombre</td>
+                <td>@venta.IdUsuarioNavigation?.Nombre</td>
+                <td>@venta.MontoTotal.ToString("C", CultureInfo.GetCultureInfo("es-MX"))</td>
+                <td>@venta.Saldo.ToString("C", CultureInfo.GetCultureInfo("es-MX"))</td>
+                <td>@venta.Tipo</td>
+                <td>@venta.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@venta.Estado</td>
+                @if (DateOnly.FromDateTime(DateTime.Now) == venta.Fecha && venta.Estado != "Cancelada")
+                {
+                    <td><a asp-route-id="@venta.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
+                    <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
+                                    data-bs-target="#modalEliminar" data-id="@venta.Id">Cancelar</button></td>
+                    }
+                    else
+                    {
+                        <td><a class="btn btn-warning disabled">Actualizar</a></td>
+                        <td><button class="btn btn-danger disabled">Cancelar</button></td>
+                    }
+
+                    @if (venta.Tipo.Trim().Equals("Crédito", StringComparison.OrdinalIgnoreCase) && venta.Estado != "Cancelada" && venta.Saldo > 0)
+                    {
+                        <td><button type="button" class="btn btn-success btnPagar" data-bs-toggle="modal"
+                                        data-bs-target="#modalPagar" data-id="@venta.Id">Pagar</button></td>
+                        } else
+                        {
+                            <td> @(venta.Estado == "Cancelada"? "Cancelada" : "Pagada") </td>
+                        }
+                        <td><a asp-route-id="@venta.Id" class="btn btn-success" asp-action="DetalleVenta">Detalles</a></td>
+                    </tr>
+                }
+            
+            </tbody>
+        </table>
+        <div class="modal fade" id="modalEliminar" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar cancelación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form asp-action="Cancelar" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="idVenta" value="" />
+                        <div class="modal-body">
+                            <p>¿Desea cancelar esta venta?</p>
+                            <label for="motivoCancelacion" class="form-label">Motivo de cancelación</label>
+                            <textarea class="form-control" id="motivoCancelacion" name="motivoCancelacion" rows="3"
+                                      placeholder="Ingrese el motivo (opcional)"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-danger">Cancelar venta</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalPagar" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar pago</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Desea registrar el pago de esta venta? El saldo quedará en $0.00.
+                    </div>
+                    <div class="modal-footer">
+                        <form asp-action="Pagar" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" id="idVentaPagar" value="" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Confirmar pago</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @section Scripts {
+            <script>
+                const botones = document.querySelectorAll(".btnEliminar");
+                const txtId = document.getElementById("idVenta");
+                botones.forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const id = this.getAttribute("data-id");
+                        txtId.value = id;
+                    });
+                });
+                const botonesPagar = document.querySelectorAll(".btnPagar");
+                const txtIdPagar = document.getElementById("idVentaPagar");
+                botonesPagar.forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        const id = this.getAttribute("data-id");
+                        txtIdPagar.value = id;
+                    });
+                });
+            </script>
+        }

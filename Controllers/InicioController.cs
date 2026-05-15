@@ -54,6 +54,7 @@ namespace TECNOKARNY.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, usuario.Correo),
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Name, usuario.Nombre),
                 new Claim(ClaimTypes.Role, usuario.IdRolNavigation.Rol)
             };

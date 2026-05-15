@@ -20,12 +20,10 @@ namespace TECNOKARNY.Controllers
         {
             this.db = db;
         }
-        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Principal()
         {
             return View(await db.Pagos.Include(x => x.IdUsuarioNavigation).ToListAsync());
         }
-        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear()
         {
             ViewBag.IdUsuario = new SelectList(db.Usuarios.ToList(), "Id", "Nombre");
@@ -41,7 +39,6 @@ namespace TECNOKARNY.Controllers
         }
         
         [HttpGet]
-        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Actualizar(int Id)
         {
             var pago = await db.Pagos.FindAsync(Id); 

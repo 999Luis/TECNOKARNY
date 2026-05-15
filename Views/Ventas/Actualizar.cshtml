@@ -1,0 +1,221 @@
+@using System.Security.Claims
+@model VentaViewModel
+
+<form asp-action="Actualizar" method="post" id="formVenta">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <input asp-for="Id" type="hidden" />
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <label asp-for="IdCliente"></label>
+            <select asp-for="IdCliente" asp-items="ViewBag.Clientes" class="form-select" id="IdCliente" required>
+                <option value="">-- Seleccionar cliente --</option>
+            </select>
+            <span asp-validation-for="IdCliente" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Tipo"></label>
+            <select asp-for="Tipo" class="form-select" id="Tipo" required>
+                <option value="">-- Seleccionar tipo --</option>
+                <option value="Contado">Contado</option>
+                <option value="Crédito">Crédito</option>
+            </select>
+            <span asp-validation-for="Tipo" class="text-danger"></span>
+            <input asp-for="IdUsuario" type="hidden" value="@User.FindFirst(ClaimTypes.NameIdentifier)?.Value" />
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <label asp-for="Fecha"></label>
+            <input asp-for="Fecha" class="form-control" type="date" readonly />
+            <span asp-validation-for="Fecha" class="text-danger"></span>
+        </div>
+        <div class="col-md-4" id="divFechaVencimiento">
+            <label asp-for="FechaVencimiento"></label>
+            <input asp-for="FechaVencimiento" class="form-control" type="date" readonly />
+            <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+        </div>
+        <div class="col-md-4" id="divSaldo">
+            <input asp-for="Saldo" class="form-control" type="number" id="inputSaldo" hidden />
+            <span asp-validation-for="Saldo" class="text-danger"></span>
+        </div>
+    </div>
+
+    <h5 class="mt-4 mb-3">Productos de la venta</h5>
+
+    <div class="table-responsive">
+        <table class="table table-bordered" id="tablaProductos">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad (Kg)</th>
+                    <th>Precio por Kilogramo</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="bodyProductos">
+                @if (Model.DetallesVenta != null && Model.DetallesVenta.Count > 0)
+                {
+                    @for (int i = 0; i < Model.DetallesVenta.Count; i++)
+                    {
+                        var listaProductos = (IEnumerable<SelectListItem>)ViewBag.Productos;
+                        var nombreProducto = listaProductos.FirstOrDefault(x => x.Value == Model.DetallesVenta[i].IdProducto.ToString())?.Text;
+                        <tr>
+                            <td>
+                                @nombreProducto
+                                <input type="hidden" name="DetallesVenta[@i].IdProducto" value="@Model.DetallesVenta[i].IdProducto" />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control cantidad" name="DetallesVenta[@i].Cantidad" value="@Model.DetallesVenta[i].Cantidad" step="0.01" min="0" required />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control precio-kilo" name="DetallesVenta[@i].PrecioKilo" value="@Model.DetallesVenta[i].PrecioKilo" step="0.01" min="0" required />
+                            </td>
+                            <td>
+                                <input type="number" class="form-control subtotal" name="DetallesVenta[@i].Subtotal" value="@Model.DetallesVenta[i].Subtotal" step="0.01" min="0" readonly />
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-4" id="divCambio">
+            <label>Pago</label>
+            <input class="form-control" type="number" step="0.01" id="pago" placeholder="Ingrese el pago" min="0" />
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8"></div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6><span id="tituloMontoTotal">Monto Total:</span> <strong id="montoTotal">$0.00</strong></h6>
+                    <h6>Cambio: <strong id="cambio">$0.00</strong></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input asp-for="MontoTotal" type="hidden" id="inputMontoTotal" />
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Guardar Venta</button>
+        <a asp-action="Principal" class="btn btn-dark">Regresar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function aplicarTipo() {
+            const tipo = document.getElementById("Tipo").value;
+            const divSaldo = document.getElementById("divSaldo");
+            const divFechaVencimiento = document.getElementById("divFechaVencimiento");
+            const divCambio = document.getElementById("divCambio");
+            const tituloMontoTotal = document.getElementById("tituloMontoTotal");
+
+            if (tipo === "Contado") {
+                divSaldo.style.display = "none";
+                divFechaVencimiento.style.display = "none";
+                divCambio.style.display = "block";
+                tituloMontoTotal.textContent = "Monto Total:";
+                // Al cambiar a Contado, el saldo queda en 0
+                document.getElementById("inputSaldo").value = "0";
+            } else if (tipo === "Crédito") {
+                divSaldo.style.display = "block";
+                divFechaVencimiento.style.display = "block";
+                divCambio.style.display = "none";
+                tituloMontoTotal.textContent = "Saldo:";
+                // Al cambiar a Crédito, el saldo toma el monto total actual
+                const total = parseFloat(document.getElementById("inputMontoTotal").value) || 0;
+                document.getElementById("inputSaldo").value = total.toFixed(2);
+            } else {
+                // Sin selección: ocultar ambos
+                divSaldo.style.display = "none";
+                divFechaVencimiento.style.display = "none";
+                divCambio.style.display = "none";
+            }
+        }
+
+        document.getElementById("Tipo").addEventListener("change", aplicarTipo);
+
+        aplicarTipo();
+        
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll(".subtotal").forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById("montoTotal").textContent = "$" + total.toFixed(2);
+            document.getElementById("inputMontoTotal").value = total.toFixed(2);
+
+            if (document.getElementById("Tipo").value === "Crédito") {
+                document.getElementById("inputSaldo").value = total.toFixed(2);
+            }
+
+            calcularCambio();
+        }
+
+        document.querySelectorAll(".cantidad").forEach(input => {
+            input.addEventListener("change", function () {
+                // FIX: navegar al <tr> padre para obtener el precio correcto
+                const fila = this.closest("tr");
+                const precio = parseFloat(fila.querySelector(".precio-kilo").value) || 0;
+                const cantidad = parseFloat(this.value) || 0;
+                const subtotal = fila.querySelector(".subtotal");
+                subtotal.value = (cantidad * precio).toFixed(2);
+                calcularTotal();
+            });
+        });
+
+        document.querySelectorAll(".precio-kilo").forEach(input => {
+            input.addEventListener("change", function () {
+                const fila = this.closest("tr");
+                const cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;
+                const precio = parseFloat(this.value) || 0;
+                const subtotal = fila.querySelector(".subtotal");
+                subtotal.value = (cantidad * precio).toFixed(2);
+                calcularTotal();
+            });
+        });
+
+        document.getElementById("pago").addEventListener("change", calcularCambio);
+
+        function calcularCambio() {
+            const pago = parseFloat(document.getElementById("pago").value) || 0;
+            const total = parseFloat(document.getElementById("inputMontoTotal").value) || 0;
+            const cambio = pago - total;
+
+            if (pago > 0 && cambio < 0) {
+                alert("El pago es insuficiente.");
+                document.getElementById("cambio").textContent = "$0.00";
+                return;
+            }
+            document.getElementById("cambio").textContent = "$" + (cambio >= 0 ? cambio.toFixed(2) : "0.00");
+        }
+
+        document.getElementById("IdCliente").addEventListener("change", async function () {
+            const idCliente = this.value;
+            if (idCliente) {
+                const response = await fetch(`/Ventas/VerificarDeuda?idCliente=${idCliente}`);
+                const data = await response.json();
+
+                if (data && data.id > 0) {
+                    alert(`El cliente tiene un saldo pendiente de $${data.saldo.toFixed(2)}`);
+                    if (confirm("¿Ir a pagar el adeudo?")) {
+                        window.location.href = `/Ventas/Actualizar/${data.id}`;
+                    } else {
+                        this.value = "";
+                    }
+                }
+            }
+        });
+
+        calcularTotal();
+    </script>
+}
