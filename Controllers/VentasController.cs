@@ -19,13 +19,26 @@ namespace TECNOKARNY.Controllers
             this.db = db;
         }
 
-        public async Task<IActionResult> Principal()
+        public async Task<IActionResult> Principal(string? busqueda)
         {
-            var ventas = await db.Ventas
+            ViewBag.Busqueda = busqueda;
+
+            var consulta = db.Ventas
                 .Include(v => v.IdClienteNavigation)
                 .Include(v => v.IdUsuarioNavigation)
                 .Include(v => v.DetalleVenta)
-                .ToListAsync();
+                .AsQueryable();
+                if (!User.IsInRole("Administrador"))
+            {
+                var UserId = byte.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                consulta = consulta.Where(v => v.IdUsuario == UserId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(busqueda)){
+                consulta = consulta.Where(v => v.IdClienteNavigation.Nombre.Contains(busqueda));
+            }
+            var ventas = await consulta.OrderByDescending(v => v.Fecha).ToListAsync();
+
             return View(ventas);
         }
         public async Task<IActionResult> Crear()

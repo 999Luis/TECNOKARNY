@@ -20,10 +20,15 @@ namespace TECNOKARNY.Controllers
             this.db = db;
         }
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> Principal()
+        public async Task<IActionResult> Principal( string? busqueda)
         {
-            var productos = await db.Productos.ToListAsync();
-            return View(productos);
+            ViewBag.Busqueda = busqueda;
+             var consulta = db.Productos.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                consulta = consulta.Where(p => p.Nombre.Contains(busqueda));
+            }
+            return View(await consulta.ToListAsync());
         }
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear()
@@ -34,9 +39,16 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Productos producto)
         {
+            var existe = await db.Productos.AnyAsync(p => p.Nombre == producto.Nombre);
+            if (existe)
+            {
+                ModelState.AddModelError("Nombre", "Ya existe un producto con ese nombre.");
+                return View(producto);
+            }
             db.Productos.Add(producto);
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
+
         }
         
         [HttpGet]
@@ -50,6 +62,7 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Actualizar(Productos producto)
         {
             if (ModelState.IsValid)

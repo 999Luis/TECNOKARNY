@@ -5,8 +5,20 @@
     culture.NumberFormat.CurrencySymbol = "$";
     ViewData["Title"] = "Productos";
 }
-<a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar</a>
-<a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary mt-4 mb-4" style="background-color: #9a0000;">Inicio</a>
+<div class="d-flex align-items-center gap-2 mt-4 mb-4 flex-wrap">
+    <a asp-action="Crear" class="btn btn-success">Registrar</a>
+    <a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary"
+       style="background-color: #9a0000;">Inicio</a>
+    <form method="get" asp-action="Principal" asp-controller="Productos" class="d-flex gap-2 ms-auto">
+        <input type="text" name="busqueda" value="@ViewBag.Busqueda" class="form-control" placeholder="Buscar producto..."
+               style="width:220px;" />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        @if (!string.IsNullOrEmpty(ViewBag.Busqueda as string))
+        {
+            <a asp-action="Principal" class="btn btn-outline-danger">Limpiar</a>
+        }
+    </form>
+</div>
 <table class="table table-hovered table-bordered">
     <thead>
         <tr>
@@ -23,47 +35,47 @@
                     <td>@String.Format(culture, "{0:C}", producto.PrecioKilo)</td>
                     <td><a asp-route-id="@producto.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
                     <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
-                            data-bs-target="#modalEliminar" data-id="@producto.Id">Eliminar</button></td>
-                </tr>
-            }
-        </tbody>
-    </thead>
-</table>
-<div class="modal fade" id="modalEliminar" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                ¿Desea eliminar este producto?
-            </div>
-            <div class="modal-footer">
-                <form asp-action="Eliminar" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" id="idProducto" value="">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-danger">
-                        Eliminar
-                    </button>
-                </form>
+                                    data-bs-target="#modalEliminar" data-id="@producto.Id">Eliminar</button></td>
+                    </tr>
+                }
+            </tbody>
+        </thead>
+    </table>
+    <div class="modal fade" id="modalEliminar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Desea eliminar este producto?
+                </div>
+                <div class="modal-footer">
+                    <form asp-action="Eliminar" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="idProducto" value="">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            Eliminar
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
-    <script>
-        const botones = document.querySelectorAll(".btnEliminar");
-        const txtId = document.getElementById("idProducto");
-        botones.forEach(btn => {
-            btn.addEventListener("click", function () {
-                const id = this.getAttribute("data-id");
-                txtId.value = id;
+    @section Scripts {
+        <script>
+            const botones = document.querySelectorAll(".btnEliminar");
+            const txtId = document.getElementById("idProducto");
+            botones.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    txtId.value = id;
+                });
             });
-        });
-    </script>
-}
+        </script>
+    }

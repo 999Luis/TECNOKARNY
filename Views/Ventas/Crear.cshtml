@@ -137,6 +137,17 @@
             const filaVacia = document.getElementById("filaVacia");
             if (filaVacia) filaVacia.remove();
 
+            const productoSeleccionado = Array.from(doument.querySelectorAll(".productoSeleccionado")).map(s => s.value).filter(v => v !== " ");
+            const productosDisponibles = productosData.filter(p => !productoSeleccionado.includes(p.Id.toString()));
+
+            if (productosDisponibles.length === 0)
+            {
+                alert("No hay mas productos para agregar!!!");
+                if (!document.querySelector("#bodyProductos tr : not(#filaVacia)")){
+                    tbody.innerHTML = '<tr id="filaVacia" class="text-center text-muted"><td colspan="5">Agregue productos a la venta</td></tr>';
+                }
+                return;
+            }
             const fila = document.createElement("tr");
             fila.id = "fila_" + contadorFilas;
 
@@ -144,7 +155,7 @@
                             <td>
                                 <select class="form-select productoSelect" name="DetallesVenta[${contadorFilas}].IdProducto" required>
                                     <option value="">-- Seleccionar --</option>
-                                    ${productosData.map(p => `<option value="${p.Id}" data-precio="${p.PrecioKilo}">${p.Nombre}</option>`).join("")}
+                                    ${productosDisponibles.map(p => `<option value="${p.Id}" data-precio="${p.PrecioKilo}">${p.Nombre}</option>`).join("")}
                                 </select>
                             </td>
                             <td>

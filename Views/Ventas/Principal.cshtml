@@ -3,14 +3,27 @@
 @{
     ViewData["Title"] = "Ventas";
 }
-@if(ViewBag.NombreCliente != null)
+@if (ViewBag.NombreCliente != null)
 {
     <h2 class="mt-4">Ventas: <strong>@ViewBag.NombreCliente</strong></h2>
     <a asp-controller="Clientes" asp-action="Principal" class="btn btn-dark mt-4 mb-4">Regresar</a>
-} else
+}
+else
 {
-    <a asp-action="Crear" class="btn btn-success mt-4 mb-4">Registrar venta</a>
-    <a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary mt-4 mb-4" style="background-color: #9a0000;">Inicio</a>
+    <div class="d-flex align-items-center gap-2 mt-4 mb-4 flex-wrap">
+        <a asp-action="Crear" class="btn btn-success">Registrar venta</a>
+        <a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary"
+           style="background-color: #9a0000;">Inicio</a>
+            <form method="get" asp-action="Principal" asp-controller="Ventas" class="d-flex gap-2 ms-auto">
+            <input type="text" name="busqueda" value="@ViewBag.Busqueda" class="form-control"
+                   placeholder="Buscar por cliente..." style="width:220px;" />
+            <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+            @if (!string.IsNullOrEmpty(ViewBag.Busqueda as string))
+            {
+                <a asp-action="Principal" class="btn btn-outline-danger">Limpiar</a>
+            }
+        </form>
+    </div>
 }
 <table class="table table-hover table-bordered">
     <thead>
@@ -64,7 +77,7 @@
                         <td><a asp-route-id="@venta.Id" class="btn btn-success" asp-action="DetalleVenta">Detalles</a></td>
                     </tr>
                 }
-            
+
             </tbody>
         </table>
         <div class="modal fade" id="modalEliminar" tabindex="-1">
