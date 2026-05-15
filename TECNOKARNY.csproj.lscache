@@ -63,8 +63,10 @@ Controllers/
  ProductosController.cs
  UsuariosController.cs
  VentasController.cs
+Helpers/PasswordHelper.cs
 Models/
  BdtecnokarnyContext.cs
+ CambiarPasswordViewModel.cs
  Clientes.cs
  ClientesMetaData.cs
  Cotizaciones.cs
@@ -74,6 +76,7 @@ Models/
  Login.cs
  Pagos.cs
  PagosMetaData.cs
+ PerfilViewModel.cs
  Productos.cs
  ProductosMetaData.cs
  Roles.cs
@@ -488,7 +491,9 @@ Views/Shared/
  _ValidationScriptsPartial.cshtml
 Views/Usuarios/
  Actualizar.cshtml
+ CambiarPassword.cshtml
  Crear.cshtml
+ Perfil.cshtml
  Principal.cshtml
 Views/Ventas/
  Actualizar.cshtml
@@ -527,7 +532,9 @@ Views/Shared/
  _ValidationScriptsPartial.cshtml
 Views/Usuarios/
  Actualizar.cshtml
+ CambiarPassword.cshtml
  Crear.cshtml
+ Perfil.cshtml
  Principal.cshtml
 Views/Ventas/
  Actualizar.cshtml

@@ -1,0 +1,18 @@
+@model PerfilViewModel
+
+@{
+    ViewData["Title"] = "Perfil";
+}
+
+<h3 class="title">Perfil</h3>
+
+<div class="form-group">
+    <p><b>Nombre:</b> @Model.Nombre</p>
+    <p><b>Correo:</b> @Model.Correo</p>
+    <p><b>Rol:</b> @Model.Rol</p>
+</div>
+
+@if (TempData["ok"] != null)
+{
+    <h3 class="btn btn-success">@TempData["ok"]!.ToString()</h3>
+}

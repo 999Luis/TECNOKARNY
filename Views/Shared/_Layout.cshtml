@@ -55,10 +55,20 @@
                                     <a class="nav-link active" aria-current="page" asp-controller="Clientes"
                                        asp-action="Principal">Clientes</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" asp-action="CerrarSesion" asp-controller="Inicio">Cerrar
-                                        sesión</a>
-                                    </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                       aria-expanded="false">
+                                        Perfil
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-action="Perfil" asp-controller="Usuarios">Ver perfil</a></li>
+                                        <li><a class="dropdown-item" asp-action="CambiarPassword" asp-controller="Usuarios">Cambiar Contraseña</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" asp-action="CerrarSesion" asp-controller="Inicio">Cerrar sesión</a></li>
+                                    </ul>
+                                </li>
                                 </ul>
                             </div>
                         </div>
