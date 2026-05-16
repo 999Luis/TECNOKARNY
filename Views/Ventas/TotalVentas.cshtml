@@ -1,0 +1,93 @@
+@using System.Globalization
+@{
+    ViewData["Title"] = "Total de Ventas";
+    var culture = CultureInfo.GetCultureInfo("es-MX");
+}
+
+<h3 class="mt-4">Reporte del dia</h3>
+<form method="post" asp-action="TotalVentas" class="d-flex gap-2 align-items-end mt-3 mb-4">
+    @Html.AntiForgeryToken()
+    <div>
+        <label class="form-label">Fecha a consultar</label>
+        <input type="date" class="form-control" name="fecha" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@ViewBag.Fecha" required/>
+    </div>
+    <button type="submit" class="btn btn-success">Consultar</button>
+    <a asp-action="Principal" class="btn btn-secondary" style="background-color: #9a0000;">Regresar</a>
+</form>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (ViewBag.SinVentas == true)
+{
+    <div class="alert alert-warning">No se registraron ventas el @ViewBag.Fecha.ToString("dd/MM/yyyy").</div>
+}
+
+@if (ViewBag.Ventas != null)
+{
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Total Ventas</h6>
+                    <h4>@(((decimal)ViewBag.TotalVentas).ToString("C", culture))</h4>
+                    <small class="text-muted">Contado + Crédito</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Total Ingresos</h6>
+                    <h4>@(((decimal)ViewBag.TotalIngresos).ToString("C", culture))</h4>
+                    <small class="text-muted">Solo contado</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Total Crédito</h6>
+                    <h4>@(((decimal)ViewBag.TotalCredito).ToString("C", culture))</h4>
+                    <small class="text-muted">Ventas a crédito</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5>Detalle de ventas del @(((DateOnly)ViewBag.Fecha).ToString("dd/MM/yyyy"))</h5>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cliente</th>
+                <th>Tipo</th>
+                <th>Monto Total</th>
+                <th>Saldo</th>
+                <th>Productos</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var venta in ViewBag.Ventas)
+            {
+                <tr>
+                    <td>@venta.Id</td>
+                    <td>@venta.IdClienteNavigation?.Nombre</td>
+                    <td>@venta.Tipo</td>
+                    <td>@(((decimal)venta.MontoTotal).ToString("C", culture))</td>
+                    <td>@(((decimal)venta.Saldo).ToString("C", culture))</td>
+                    <td>
+                        <ul class="mb-0">
+                            @foreach (var detalle in venta.DetalleVenta)
+                            {
+                                <li>@detalle.IdProductoNavigation?.Nombre — @detalle.Cantidad kg</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+

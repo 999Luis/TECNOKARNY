@@ -64,6 +64,12 @@ namespace TECNOKARNY.Controllers
                 return View();
             }
 
+            if (usuario.Estado == "Inactivo")
+            {
+                ViewBag.Error = "Usuario inactivo, cuenta bloqueada";
+                return View();
+            }
+
 
             var claims = new List<Claim>
             {

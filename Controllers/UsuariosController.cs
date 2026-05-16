@@ -39,6 +39,9 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Usuarios user)
         {
+            var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<Usuarios>();
+            user.Pwd = hasher.HashPassword(user, user.Pwd);
+            
             db.Usuarios.Add(user);
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
@@ -66,11 +69,15 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Elminar(byte Id)
+        public async Task<IActionResult> Eliminar(byte Id)
         {
             var user = await db.Usuarios.FindAsync(Id);
-            user!.Estado = "Inactivo";
-            db.Update(user!);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.Estado = "Inactivo";
+            db.Update(user);
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }
@@ -94,40 +101,40 @@ namespace TECNOKARNY.Controllers
             return View(vm);
         }
 
-         public IActionResult CambiarPassword()
+        public IActionResult CambiarPassword()
         {
             return View();
         }
- 
+
         [HttpPost]
         public IActionResult CambiarPassword(CambiarPasswordViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
- 
+
             var userId = byte.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
- 
+
             var usuario = db.Usuarios.Find(userId);
- 
+
             var ps = new PasswordHelper();
- 
+
             // validar contraseña anterior
             var valido = ps.VerifyPassword(
                 usuario,
                 usuario.Pwd,
                 model.PasswordActual);
- 
+
             if (!valido)
             {
                 ModelState.AddModelError("", "Contraseña actual incorrecta");
                 return View(model);
             }
- 
+
             // actualizar contraseña
             usuario.Pwd = ps.HashPassword(usuario, model.PasswordNueva);
- 
+
             db.SaveChanges();
-            return RedirectToAction("Perfil","Usuarios");
+            return RedirectToAction("Perfil", "Usuarios");
         }
     }
 }

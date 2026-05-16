@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TECNOKARNY")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+744100f600b8534bfb50baf1a45d4603b54e7bd7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9dfeba19e0f9ed6fd974cc15de090529f7b9291a")]
 [assembly: System.Reflection.AssemblyProductAttribute("TECNOKARNY")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TECNOKARNY")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -30,7 +30,7 @@
                     <td>@cliente.Correo</td>
                     <td>@cliente.Direccion</td>
                     <td><a asp-action="VentasCliente" asp-route-id="@cliente.Id" class="btn btn-primary">Ver</a></td>
-                    <td></td>
+                    <td><a asp-action="CotizacionesCliente" asp-controller="Cotizaciones" asp-route-id="@cliente.Id" class="btn btn-primary">Ver</a></td>
                     <td><a asp-route-id="@cliente.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
                     <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
                             data-bs-target="#modalEliminar" data-id="@cliente.Id">Eliminar</button></td>

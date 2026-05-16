@@ -1,0 +1,104 @@
+@model TECNOKARNY.Models.Cotizaciones
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Detalle Cotización";
+    var culture = CultureInfo.GetCultureInfo("es-MX");
+}
+
+<h3 class="mt-4"><strong>Cotización #@Model.Id</strong></h3>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Información general</h5>
+                <p><strong>Cliente:</strong> @Model.IdClienteNavigation?.Nombre @Model.IdClienteNavigation?.ApePat @Model.IdClienteNavigation?.ApeMat</p>
+                <p><strong>Registrado por:</strong> @Model.IdUsuarioNavigation?.Nombre</p>
+                <p><strong>Fecha de emisión:</strong> @Model.FechaEmision.ToString("dd/MM/yyyy")</p>
+                <p><strong>Fecha del evento:</strong> @Model.FechaEvento.ToString("dd/MM/yyyy")</p>
+                <p><strong>Hora:</strong> @Model.Hora.ToString("hh\\:mm tt")</p>
+                <p><strong>Dirección:</strong> @Model.Direccion</p>
+                <p><strong>Asistentes:</strong> @Model.Asistentes</p>
+                <p><strong>Anticipo:</strong>
+                    @if (Model.Anticipo == true)
+                    {
+                        <span class="badge bg-success">Pagado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No pagado</span>
+                    }
+                </p>
+                <p><strong>Estado:</strong>
+                    @{
+                        var badgeClass = Model.EstadoCot switch
+                        {
+                            "Vigente" => "bg-primary",
+                            "Confirmada" => "bg-success",
+                            "Expirada" => "bg-danger",
+                            "Finalizada" => "bg-secondary",
+                            _ => "bg-secondary"
+                        };
+                    }
+                    <span class="badge @badgeClass">@Model.EstadoCot</span>
+                </p>
+                <p><strong>Saldo Total:</strong> @Model.SaldoTotal.ToString("C", culture)</p>
+            </div>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Administrador"))
+    {
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Cambiar estado</h5>
+                    <form asp-action="CambiarEstado" method="post" class="d-flex gap-2 flex-wrap">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <select name="estado" class="form-select" style="width:auto;">
+                            <option value="Vigente" selected="@(Model.EstadoCot=="Vigente")">Vigente</option>
+                            <option value="Confirmada" selected="@(Model.EstadoCot=="Confirmada")">Confirmada</option>
+                            <option value="Expirada" selected="@(Model.EstadoCot=="Expirada")">Expirada</option>
+                            <option value="Finalizada" selected="@(Model.EstadoCot=="Finalizada")">Finalizada</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h5 class="mt-2">Productos cotizados</h5>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad (Kg)</th>
+                <th>Precio por Kilo</th>
+                <th>Precio Cotizado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.DetalleCotizacion)
+            {
+                <tr>
+                    <td>@d.IdProductoNavigation?.Nombre</td>
+                    <td>@d.Cantidad</td>
+                    <td>@d.PrecioKilo.ToString("C", culture)</td>
+                    <td>@d.PrecioCotizado.ToString("C", culture)</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="table-secondary">
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td><strong>@Model.SaldoTotal.ToString("C", culture)</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<a asp-action="Principal" class="btn btn-dark mt-2">Regresar</a>

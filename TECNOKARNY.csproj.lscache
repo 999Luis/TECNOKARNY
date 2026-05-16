@@ -57,6 +57,7 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 [sourceFiles]
 Controllers/
  ClientesController.cs
+ CotizacionesController.cs
  HomeController.cs
  InicioController.cs
  PagosController.cs
@@ -70,6 +71,7 @@ Models/
  Clientes.cs
  ClientesMetaData.cs
  Cotizaciones.cs
+ CotizacionViewModel.cs
  DetalleCotizacion.cs
  DetalleVenta.cs
  ErrorViewModel.cs
@@ -468,6 +470,10 @@ Views/Clientes/
  Actualizar.cshtml
  Crear.cshtml
  Principal.cshtml
+Views/Cotizaciones/
+ Crear.cshtml
+ DetalleCotizacion.cshtml
+ Principal.cshtml
 Views/Home/
  Index.cshtml
  Privacy.cshtml
@@ -500,6 +506,7 @@ Views/Ventas/
  Crear.cshtml
  DetalleVenta.cshtml
  Principal.cshtml
+ TotalVentas.cshtml
 Views/
  _ViewImports.cshtml
  _ViewStart.cshtml
@@ -509,6 +516,10 @@ Views/Clientes/
  Actualizar.cshtml
  Crear.cshtml
  Principal.cshtml
+Views/Cotizaciones/
+ Crear.cshtml
+ DetalleCotizacion.cshtml
+ Principal.cshtml
 Views/Home/
  Index.cshtml
  Privacy.cshtml
@@ -541,6 +552,7 @@ Views/Ventas/
  Crear.cshtml
  DetalleVenta.cshtml
  Principal.cshtml
+ TotalVentas.cshtml
 Views/
  _ViewImports.cshtml
  _ViewStart.cshtml

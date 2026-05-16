@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -268,6 +269,41 @@ namespace TECNOKARNY.Controllers
             return View(venta);
         }
 
-        
+        public async Task<IActionResult> TotalVentas()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> TotalVentas(DateOnly fecha)
+        {
+            if (fecha > DateOnly.FromDateTime(DateTime.Now))
+            {
+                ViewBag.Error = "La fecha no puede ser mayor al dia de hoy.";
+                return View();
+            }
+
+            var ventas = await db.Ventas
+                .Include(v => v.IdClienteNavigation)
+                .Include(v => v.DetalleVenta)
+                .ThenInclude(d => d.IdProductoNavigation)
+                .Where(v => v.Fecha == fecha && v.Estado != "Cancelada")
+                .ToListAsync();
+
+                if (!ventas.Any())
+                {
+                    ViewBag.Fecha = fecha;
+                    ViewBag.SinVentas = true;
+                    return View();
+                }
+
+                ViewBag.Fecha = fecha;
+                ViewBag.TotalVentas = ventas.Sum(v => v.MontoTotal);
+                ViewBag.TotalIngresos = ventas.Where(v => v.Tipo.Trim() == "Contado").Sum(v => v.MontoTotal);
+                ViewBag.TotalCredito = ventas.Where(v => v.Tipo.Trim() == "Crédito").Sum(v => v.MontoTotal);
+                ViewBag.Ventas = ventas;
+
+                return View();
+        }
     }
 }

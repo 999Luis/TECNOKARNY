@@ -1,0 +1,88 @@
+@model IEnumerable<TECNOKARNY.Models.Cotizaciones>
+
+@{
+    ViewData["Title"] = "Cotizaciones";
+}
+@if (ViewBag.NombreCliente != null)
+{
+    <h5 class="mb-3">Cotizaciones de: <strong>@ViewBag.NombreCliente</strong></h5>
+    <a asp-controller="Clientes" asp-action="Principal" class="btn btn-dark mb-3">Regresar</a>
+}
+else
+{
+    <h3 class="mt-4">Cotizaciones</h3>
+
+    <div class="d-flex align-items-center gap-2 mt-3 mb-4 flex-wrap">
+        <a asp-action="Crear" class="btn btn-success">Nueva cotización</a>
+        <a asp-controller="Inicio" asp-action="MenuInicio" class="btn btn-secondary"
+           style="background-color:#9a0000;">Inicio</a>
+        <form method="get" asp-action="Principal" asp-controller="Cotizaciones" class="d-flex gap-2 ms-auto">
+            <input type="text" name="buscar" value="@ViewBag.Buscar" class="form-control"
+                   placeholder="Buscar por cliente..." style="width:220px;" />
+            <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+            @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+            {
+                <a asp-action="Principal" class="btn btn-outline-danger">Limpiar</a>
+            }
+        </form>
+    </div>
+}
+
+
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay cotizaciones registradas.</div>
+}
+else
+{
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Cliente</th>
+                    <th>Fecha Emisión</th>
+                    <th>Fecha Evento</th>
+                    <th>Hora</th>
+                    <th>Asistentes</th>
+                    <th>Saldo Total</th>
+                    <th>Anticipo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>@c.IdClienteNavigation?.Nombre</td>
+                        <td>@c.FechaEmision.ToString("dd/MM/yyyy")</td>
+                        <td>@c.FechaEvento.ToString("dd/MM/yyyy")</td>
+                        <td>@c.Hora.ToString("hh\\:mm")</td>
+                        <td>@c.Asistentes</td>
+                        <td>@c.SaldoTotal.ToString("C")</td>
+                        <td>
+                            @if (c.Anticipo == true)
+                            {
+                                <span>Sí</span>
+                            }
+                            else
+                            {
+                                <span>No</span>
+                            }
+                        </td>
+                        <td>
+                            <span>@c.EstadoCot</span>
+                        </td>
+                        <td>
+                            <a asp-action="DetalleCotizacion" asp-route-id="@c.Id" class="btn btn-success">Ver</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
