@@ -12,6 +12,7 @@
         <tr>
             <th>Nombre</th>
             <th>Correo</th>
+            <th>Estado</th>
             <th>Rol</th>
             <th></th>
         </tr>
@@ -21,6 +22,7 @@
                 <tr>
                     <td>@usuario.Nombre</td>
                     <td>@usuario.Correo</td>
+                    <td>@usuario.Estado</td>
                     <td>@usuario.IdRolNavigation.Rol</td>
                     <td><a asp-route-id="@usuario.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
                     <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"

@@ -69,7 +69,8 @@ namespace TECNOKARNY.Controllers
         public async Task<IActionResult> Elminar(byte Id)
         {
             var user = await db.Usuarios.FindAsync(Id);
-            db.Remove(user!);
+            user!.Estado = "Inactivo";
+            db.Update(user!);
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }
