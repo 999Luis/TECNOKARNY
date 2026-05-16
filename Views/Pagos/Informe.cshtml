@@ -1,0 +1,133 @@
+@using System.Globalization
+@{
+    ViewData["Title"] = "Informe de Ingresos y Egresos";
+    var culture = CultureInfo.GetCultureInfo("es-MX");
+}
+
+<h3 class="mt-4">Informe de Ingresos y Egresos</h3>
+
+<form method="post" asp-action="Informe" class="row g-3 mt-2 mb-4 align-items-end">
+    @Html.AntiForgeryToken()
+    <div class="col-md-4">
+        <label class="form-label">Fecha inicio</label>
+        <input type="date" name="fechaInicio" class="form-control"
+               max="@DateTime.Now.ToString("yyyy-MM-dd")"
+               value="@ViewBag.FechaInicio" required />
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Fecha fin</label>
+        <input type="date" name="fechaFin" class="form-control"
+               max="@DateTime.Now.ToString("yyyy-MM-dd")"
+               value="@ViewBag.FechaFin" required />
+    </div>
+    <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Consultar</button>
+        <a asp-action="Principal" class="btn btn-secondary" style="background-color:#9a0000;">Regresar</a>
+    </div>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (ViewBag.TotalIngresos != null)
+{
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h6 class="card-title text-success">Total Ingresos</h6>
+                    <h4 class="text-success">@(((decimal)ViewBag.TotalIngresos).ToString("C", culture))</h4>
+                    <small class="text-muted">Ventas de contado</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center border-danger">
+                <div class="card-body">
+                    <h6 class="card-title text-danger">Total Egresos</h6>
+                    <h4 class="text-danger">@(((decimal)ViewBag.TotalEgresos).ToString("C", culture))</h4>
+                    <small class="text-muted">Pagos a proveedores/servicios</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            @{
+                var balance = (decimal)ViewBag.Balance;
+                var balanceClass = balance >= 0 ? "success" : "danger";
+            }
+            <div class="card text-center border-@balanceClass">
+                <div class="card-body">
+                    <h6 class="card-title text-@balanceClass">Balance</h6>
+                    <h4 class="text-@balanceClass">@(((decimal)ViewBag.Balance).ToString("C", culture))</h4>
+                    <small class="text-muted">Ingresos - Egresos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Ventas de contado</h5>
+            @if (((IEnumerable<TECNOKARNY.Models.Ventas>)ViewBag.Ventas).Any())
+            {
+                <table class="table table-bordered table-sm">
+                    <thead class="table-success">
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in (IEnumerable<TECNOKARNY.Models.Ventas>)ViewBag.Ventas)
+                        {
+                            <tr>
+                                <td>@v.Id</td>
+                                <td>@v.Fecha.ToString("dd/MM/yyyy")</td>
+                                <td>@v.MontoTotal.ToString("C", culture)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info">Sin ingresos en este período.</div>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <h5>Pagos / Egresos</h5>
+            @if (((IEnumerable<TECNOKARNY.Models.Pagos>)ViewBag.Pagos).Any())
+            {
+                <table class="table table-bordered table-sm">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in (IEnumerable<TECNOKARNY.Models.Pagos>)ViewBag.Pagos)
+                        {
+                            <tr>
+                                <td>@p.Nombre</td>
+                                <td>@p.Tipo</td>
+                                <td>@p.FechaPago.ToString("dd/MM/yyyy")</td>
+                                <td>@(((decimal)p.Monto).ToString("C", culture))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info">Sin egresos en este período.</div>
+            }
+        </div>
+    </div>
+}

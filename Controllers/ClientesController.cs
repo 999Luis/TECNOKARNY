@@ -91,7 +91,6 @@ namespace TECNOKARNY.Controllers
                 return View(cliente);
             }
 
-            clienteElegido.Nombre = cliente.Nombre;
             clienteElegido.Correo = cliente.Correo.ToLower().Trim();
 
             db.Entry(clienteElegido).State = EntityState.Modified;

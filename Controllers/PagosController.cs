@@ -49,11 +49,11 @@ namespace TECNOKARNY.Controllers
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Actualizar(int Id)
         {
-            var pago = await db.Pagos.FindAsync(Id); 
+            var pago = await db.Pagos.FindAsync(Id);
             if (pago == null) return NotFound();
             ViewBag.IdUsuario = new SelectList(db.Usuarios, "Id", "Nombre", pago.IdUsuario);
             return View(pago);
@@ -70,6 +70,51 @@ namespace TECNOKARNY.Controllers
             }
 
             return View(producto);
+        }
+        [HttpGet]
+        public IActionResult Informe()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Informe(DateOnly fechaInicio, DateOnly fechaFin)
+        {
+            if (fechaInicio > fechaFin)
+            {
+                ViewBag.Error = "La fecha de inicio no puede ser mayor a la fecha fin.";
+                return View();
+            }
+
+            if (fechaFin > DateOnly.FromDateTime(DateTime.Now))
+            {
+                ViewBag.Error = "La fecha fin no puede ser mayor a la fecha actual.";
+                return View();
+            }
+
+            var ventas = await db.Ventas
+                .Where(v => v.Fecha >= fechaInicio
+                         && v.Fecha <= fechaFin
+                         && v.Estado != "Cancelada"
+                         && v.Tipo == "Contado")
+                .ToListAsync();
+
+            var pagos = await db.Pagos
+                .Where(p => p.FechaPago >= fechaInicio && p.FechaPago <= fechaFin)
+                .ToListAsync();
+
+            var totalIngresos = ventas.Sum(v => v.MontoTotal);
+            var totalEgresos = pagos.Sum(p => p.Monto);
+
+            ViewBag.FechaInicio = fechaInicio;
+            ViewBag.FechaFin = fechaFin;
+            ViewBag.TotalIngresos = totalIngresos;
+            ViewBag.TotalEgresos = totalEgresos;
+            ViewBag.Balance = totalIngresos - totalEgresos;
+            ViewBag.Ventas = ventas;
+            ViewBag.Pagos = pagos;
+
+            return View();
         }
     }
 }
