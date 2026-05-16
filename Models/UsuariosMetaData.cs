@@ -21,6 +21,8 @@ namespace TECNOKARNY.Models
         public string Correo { get; set; } = null!;
         [Display(Name = "Contraseña")]
         [Required(ErrorMessage = "La contraseña es obligatoria")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", 
+        ErrorMessage = "La contraseña debe contener al menos una mayúscula, una minúscula y un símbolo.")]
         public string Pwd { get; set; } = null!;
         [Display(Name = "Rol del usuario")]
         [Required(ErrorMessage = "El rol es obligatorio")]

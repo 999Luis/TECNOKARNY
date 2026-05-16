@@ -45,6 +45,17 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Clientes cliente)
         {
+            bool correoExiste = await db.Clientes.AnyAsync(u => u.Correo.ToLower() == cliente.Correo.ToLower().Trim());
+
+            if (correoExiste)
+            {
+                ModelState.AddModelError("Correo", "Este correo electrónico ya se encuentra registrado.");
+
+                return View(cliente);
+            }
+
+            cliente.Correo = cliente.Correo.Trim();
+
             db.Clientes.Add(cliente);
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
@@ -64,7 +75,26 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Actualizar(Clientes cliente)
         {
-            db.Update(cliente);
+            var clienteElegido = await db.Clientes.FindAsync(cliente.Id);
+            if (clienteElegido == null)
+            {
+                return NotFound();
+            }
+            bool correoExiste = await db.Clientes.AnyAsync(c => c.Correo.ToLower() == cliente.Correo.ToLower().Trim() && c.Id != cliente.Id);
+            if (correoExiste)
+            {
+                ModelState.AddModelError("Correo", "Este correo ya le pertenece a otro usuario.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(cliente);
+            }
+
+            clienteElegido.Nombre = cliente.Nombre;
+            clienteElegido.Correo = cliente.Correo.ToLower().Trim();
+
+            db.Entry(clienteElegido).State = EntityState.Modified;
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }

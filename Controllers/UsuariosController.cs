@@ -39,11 +39,28 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Crear(Usuarios user)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(user);
+            }
+
+            bool correoExiste = await db.Usuarios.AnyAsync(u => u.Correo.ToLower() == user.Correo.ToLower().Trim());
+
+            if (correoExiste)
+            {
+                ModelState.AddModelError("Correo", "Este correo electrónico ya se encuentra registrado.");
+
+                return View(user);
+            }
+
+            user.Correo = user.Correo.Trim();
+
             var hasher = new Microsoft.AspNetCore.Identity.PasswordHasher<Usuarios>();
             user.Pwd = hasher.HashPassword(user, user.Pwd);
-            
+
             db.Usuarios.Add(user);
             await db.SaveChangesAsync();
+
             return RedirectToAction("Principal");
         }
 
@@ -63,7 +80,28 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Actualizar(Usuarios usr)
         {
-            db.Update(usr);
+            var usuarioElegido = await db.Usuarios.FindAsync(usr.Id);
+            if (usuarioElegido == null)
+            {
+                return NotFound();
+            }
+            bool correoExiste = await db.Usuarios.AnyAsync(u => u.Correo.ToLower() == usr.Correo.ToLower().Trim() && u.Id != usr.Id);
+            if (correoExiste)
+            {
+                ModelState.AddModelError("Correo", "Este correo ya le pertenece a otro usuario.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.IdRol = new SelectList(db.Roles, "Id", "Rol", usr.IdRol);
+                return View(usr);
+            }
+
+            usuarioElegido.Nombre = usr.Nombre;
+            usuarioElegido.Correo = usr.Correo.ToLower().Trim();
+            usuarioElegido.IdRol = usr.IdRol;
+
+            db.Entry(usuarioElegido).State = EntityState.Modified;
             await db.SaveChangesAsync();
             return RedirectToAction("Principal");
         }
