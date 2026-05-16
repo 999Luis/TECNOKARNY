@@ -20,13 +20,25 @@ namespace TECNOKARNY.Controllers
         {
             this.db = db;
         }
-        public async Task<IActionResult> Principal()
+
+        public async Task<IActionResult> Principal(string? busqueda)
         {
-            var clientes = await db.Clientes.ToListAsync();
+            ViewBag.Busqueda = busqueda;
+
+            var consulta = db.Clientes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                busqueda = busqueda.Trim();
+                consulta = consulta.Where(c => c.Nombre.Contains(busqueda) || c.ApePat.Contains(busqueda) || c.ApeMat.Contains(busqueda));
+            }
+
+            var clientes = await consulta.OrderBy(c => c.Nombre).ToListAsync();
+
             return View(clientes);
-            
         }
-         public IActionResult Crear()
+        
+        public IActionResult Crear()
         {
             return View();
         }
@@ -58,7 +70,7 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>Eliminar(short Id)
+        public async Task<IActionResult> Eliminar(short Id)
         {
             var cliente = await db.Clientes.FindAsync(Id);
             db.Remove(cliente!);
@@ -89,4 +101,4 @@ namespace TECNOKARNY.Controllers
             return RedirectToAction("DetalleVenta", "Ventas", new { id });
         }
     }
-} 
+}
