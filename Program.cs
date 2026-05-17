@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using TECNOKARNY.Models;
+using TECNOKARNY.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BdtecnokarnyContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddTransient<ServicioCorreo>();
+builder.Services.AddHostedService<ServicioEnvioAutomatico>();
 
 var app = builder.Build();
 

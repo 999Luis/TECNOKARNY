@@ -278,3 +278,6 @@ C:\Proyecto_Final\TECNOKARNY\obj\Debug\net10.0\TECNOKARNY.pdb
 C:\Proyecto_Final\TECNOKARNY\obj\Debug\net10.0\TECNOKARNY.genruntimeconfig.cache
 C:\Proyecto_Final\TECNOKARNY\obj\Debug\net10.0\ref\TECNOKARNY.dll
 C:\Proyecto_Final\TECNOKARNY\obj\Debug\net10.0\TECNOKARNY.sourcelink.json
+C:\Proyecto_Final\TECNOKARNY\bin\Debug\net10.0\BouncyCastle.Cryptography.dll
+C:\Proyecto_Final\TECNOKARNY\bin\Debug\net10.0\MailKit.dll
+C:\Proyecto_Final\TECNOKARNY\bin\Debug\net10.0\MimeKit.dll
