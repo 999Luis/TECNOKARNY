@@ -14,7 +14,8 @@
             <th>Correo</th>
             <th>Estado</th>
             <th>Rol</th>
-            <th></th>
+            <th>Actualizar</th>
+            <th>Eliminar</th>
         </tr>
         <tbody>
             @foreach (Usuarios usuario in Model)
@@ -25,8 +26,15 @@
                     <td>@usuario.Estado</td>
                     <td>@usuario.IdRolNavigation.Rol</td>
                     <td><a asp-route-id="@usuario.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
-                    <td><button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
-                            data-bs-target="#modalEliminar" data-id="@usuario.Id">Eliminar</button></td>
+                    <td>@if (usuario.IdRolNavigation.Rol == "Administrador")
+                    {
+                         <button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar" data-id="@usuario.Id" disabled>Eliminar</button>   
+                    } else {
+                        <button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar" data-id="@usuario.Id">Eliminar</button>  
+                    }
+                    </td>
                 </tr>
             }
         </tbody>  
