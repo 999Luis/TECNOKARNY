@@ -98,15 +98,6 @@ namespace TECNOKARNY.Controllers
             return RedirectToAction("Principal");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Eliminar(short Id)
-        {
-            var cliente = await db.Clientes.FindAsync(Id);
-            db.Remove(cliente!);
-            await db.SaveChangesAsync();
-            return RedirectToAction("Principal");
-        }
-
         public async Task<IActionResult> VentasCliente(short Id)
         {
             var cliente = await db.Clientes.FindAsync(Id);

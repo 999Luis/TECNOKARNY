@@ -156,7 +156,11 @@ namespace TECNOKARNY.Controllers
 
             var ps = new PasswordHelper();
 
-            // validar contraseña anterior
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
             var valido = ps.VerifyPassword(
                 usuario,
                 usuario.Pwd,
@@ -168,7 +172,6 @@ namespace TECNOKARNY.Controllers
                 return View(model);
             }
 
-            // actualizar contraseña
             usuario.Pwd = ps.HashPassword(usuario, model.PasswordNueva);
 
             db.SaveChanges();
