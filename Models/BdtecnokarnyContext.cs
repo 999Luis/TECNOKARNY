@@ -73,7 +73,7 @@ public partial class BdtecnokarnyContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.EstadoCot)
-                .HasMaxLength(9)
+                .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("Estado_Cot");
             entity.Property(e => e.FechaEmision).HasColumnName("Fecha_Emision");

@@ -154,8 +154,14 @@ namespace TECNOKARNY.Controllers
             db.Update(cotizacion);
             await db.SaveChangesAsync();
 
-            return RedirectToAction("Detalle", new { id });
+            return RedirectToAction("DetalleCotizacion", new { id });
         }
+
+        public IActionResult Detalle(short id)
+        {
+            return RedirectToAction("DetalleCotizacion", new { id });
+        }
+
         public async Task<IActionResult> CotizacionesCliente(short id)
         {
             var cliente = await db.Clientes.FindAsync(id);

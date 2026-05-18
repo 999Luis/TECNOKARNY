@@ -60,17 +60,20 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Actualizar(Productos producto)
+        public async Task<IActionResult> Actualizar(Pagos pago)
         {
+            ModelState.Remove("IdUsuarioNavigation");
+
             if (ModelState.IsValid)
             {
-                db.Update(producto);
+                db.Update(pago);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Principal");
             }
-
-            return View(producto);
+            ViewBag.IdUsuario = new SelectList(db.Usuarios, "Id", "Nombre", pago.IdUsuario);
+            return View(pago);
         }
+
         [HttpGet]
         public IActionResult Informe()
         {

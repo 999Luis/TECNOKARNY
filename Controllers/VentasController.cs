@@ -196,6 +196,8 @@ namespace TECNOKARNY.Controllers
             {
                 return NotFound();
             }
+            ventaModificar.IdCliente = ventaVM.IdCliente;
+            ventaModificar.IdUsuario = ventaVM.IdUsuario;
             ventaModificar.MontoTotal = ventaVM.MontoTotal;
             ventaModificar.Tipo = ventaVM.Tipo;
             ventaModificar.Saldo = ventaVM.Tipo == "Contado" ? 0m : ventaVM.MontoTotal;
