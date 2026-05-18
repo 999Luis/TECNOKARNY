@@ -26,7 +26,7 @@
                     <td>@usuario.Estado</td>
                     <td>@usuario.IdRolNavigation.Rol</td>
                     <td><a asp-route-id="@usuario.Id" class="btn btn-warning" asp-action="Actualizar">Actualizar</a></td>
-                    <td>@if (usuario.IdRolNavigation.Rol == "Administrador")
+                    <td>@if (usuario.IdRolNavigation.Rol == "Administrador" || usuario.Estado == "Inactivo")
                     {
                          <button type="button" class="btn btn-danger btnEliminar" data-bs-toggle="modal"
                             data-bs-target="#modalEliminar" data-id="@usuario.Id" disabled>Eliminar</button>   

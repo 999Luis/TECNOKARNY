@@ -37,7 +37,7 @@ namespace TECNOKARNY.Controllers
 
             return View(clientes);
         }
-        
+
         public IActionResult Crear()
         {
             return View();
@@ -75,15 +75,17 @@ namespace TECNOKARNY.Controllers
         [HttpPost]
         public async Task<IActionResult> Actualizar(Clientes cliente)
         {
-            var clienteElegido = await db.Clientes.FindAsync(cliente.Id);
-            if (clienteElegido == null)
-            {
-                return NotFound();
-            }
+            ModelState.Remove("Cotizaciones");
+            ModelState.Remove("Ventas");
+            ModelState.Remove("Nombre");
+            ModelState.Remove("ApePat");
+            ModelState.Remove("ApeMat");
+
+
             bool correoExiste = await db.Clientes.AnyAsync(c => c.Correo.ToLower() == cliente.Correo.ToLower().Trim() && c.Id != cliente.Id);
             if (correoExiste)
             {
-                ModelState.AddModelError("Correo", "Este correo ya le pertenece a otro usuario.");
+                ModelState.AddModelError("Correo", "Este correo ya le pertenece a otro cliente.");
             }
 
             if (!ModelState.IsValid)
@@ -91,7 +93,12 @@ namespace TECNOKARNY.Controllers
                 return View(cliente);
             }
 
+            var clienteElegido = await db.Clientes.FindAsync(cliente.Id);
+            if (clienteElegido == null) return NotFound();
+
+            clienteElegido.Telefono = cliente.Telefono;
             clienteElegido.Correo = cliente.Correo.ToLower().Trim();
+            clienteElegido.Direccion = cliente.Direccion;
 
             db.Entry(clienteElegido).State = EntityState.Modified;
             await db.SaveChangesAsync();

@@ -174,16 +174,20 @@ public partial class BdtecnokarnyContext : DbContext
         });
 
         modelBuilder.Entity<Productos>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Producto__3214EC07CB84F146");
+{
+    entity.HasKey(e => e.Id).HasName("PK__Producto__3214EC07CB84F146");
 
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.PrecioKilo)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("Precio_Kilo");
-        });
+    entity.Property(e => e.Nombre)
+        .HasMaxLength(50)
+        .IsUnicode(false);
+    entity.Property(e => e.PrecioKilo)
+        .HasColumnType("decimal(10, 2)")
+        .HasColumnName("Precio_Kilo");
+
+    entity.Property(e => e.Estado)
+        .HasMaxLength(10)
+        .IsUnicode(false);
+});
 
         modelBuilder.Entity<Roles>(entity =>
         {

@@ -10,6 +10,7 @@ public partial class Productos
     public string Nombre { get; set; } = null!;
 
     public decimal PrecioKilo { get; set; }
+    public string? Estado { get; set; }
 
     public virtual ICollection<DetalleCotizacion> DetalleCotizacion { get; set; } = new List<DetalleCotizacion>();
 

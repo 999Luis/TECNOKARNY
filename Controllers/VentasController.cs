@@ -29,13 +29,14 @@ namespace TECNOKARNY.Controllers
                 .Include(v => v.IdUsuarioNavigation)
                 .Include(v => v.DetalleVenta)
                 .AsQueryable();
-                if (!User.IsInRole("Administrador"))
+            if (!User.IsInRole("Administrador"))
             {
                 var UserId = byte.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
                 consulta = consulta.Where(v => v.IdUsuario == UserId);
             }
 
-            if (!string.IsNullOrWhiteSpace(busqueda)){
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
                 consulta = consulta.Where(v => v.IdClienteNavigation.Nombre.Contains(busqueda));
             }
             var ventas = await consulta.OrderByDescending(v => v.Fecha).ToListAsync();
@@ -136,9 +137,11 @@ namespace TECNOKARNY.Controllers
                 .ThenBy(c => c.ApePat)
                 .ToListAsync();
             var usuarios = await db.Usuarios
+                .Where(u => u.Estado != "Inactivo")
                 .OrderBy(u => u.Nombre)
                 .ToListAsync();
             var productos = await db.Productos
+                .Where(p => p.Estado != "Inactivo")
                 .OrderBy(p => p.Nombre)
                 .ToListAsync();
 
@@ -201,7 +204,7 @@ namespace TECNOKARNY.Controllers
             ventaModificar.MontoTotal = ventaVM.MontoTotal;
             ventaModificar.Tipo = ventaVM.Tipo;
             ventaModificar.Saldo = ventaVM.Tipo == "Contado" ? 0m : ventaVM.MontoTotal;
-            ventaModificar.FechaVencimiento = ventaVM.Tipo == "Crédito" ? ventaVM.FechaVencimiento: null;
+            ventaModificar.FechaVencimiento = ventaVM.Tipo == "Crédito" ? ventaVM.FechaVencimiento : null;
             foreach (var detalleVM in ventaVM.DetallesVenta)
             {
                 var detalleGuardado = ventaModificar.DetalleVenta
@@ -220,7 +223,7 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Pagar (int id)
+        public async Task<IActionResult> Pagar(int id)
         {
             var venta = await db.Ventas.FindAsync(id);
             if (venta == null)
@@ -235,7 +238,7 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Cancelar (int id, string motivoCancelacion)
+        public async Task<IActionResult> Cancelar(int id, string motivoCancelacion)
         {
             var venta = await db.Ventas.FindAsync(id);
             if (venta == null)
@@ -243,7 +246,7 @@ namespace TECNOKARNY.Controllers
                 return NotFound();
             }
             venta.Estado = "Cancelada";
-            venta.Saldo =0m;
+            venta.Saldo = 0m;
             venta.MotivoCancelacion = motivoCancelacion;
             db.Update(venta);
             await db.SaveChangesAsync();
@@ -267,7 +270,7 @@ namespace TECNOKARNY.Controllers
             }
 
             ViewBag.IdCliente = idCliente;
-            
+
             return View(venta);
         }
 
@@ -292,20 +295,20 @@ namespace TECNOKARNY.Controllers
                 .Where(v => v.Fecha == fecha && v.Estado != "Cancelada")
                 .ToListAsync();
 
-                if (!ventas.Any())
-                {
-                    ViewBag.Fecha = fecha;
-                    ViewBag.SinVentas = true;
-                    return View();
-                }
-
+            if (!ventas.Any())
+            {
                 ViewBag.Fecha = fecha;
-                ViewBag.TotalVentas = ventas.Sum(v => v.MontoTotal);
-                ViewBag.TotalIngresos = ventas.Where(v => v.Tipo.Trim() == "Contado").Sum(v => v.MontoTotal);
-                ViewBag.TotalCredito = ventas.Where(v => v.Tipo.Trim() == "Crédito").Sum(v => v.MontoTotal);
-                ViewBag.Ventas = ventas;
-
+                ViewBag.SinVentas = true;
                 return View();
+            }
+
+            ViewBag.Fecha = fecha;
+            ViewBag.TotalVentas = ventas.Sum(v => v.MontoTotal);
+            ViewBag.TotalIngresos = ventas.Where(v => v.Tipo.Trim() == "Contado").Sum(v => v.MontoTotal);
+            ViewBag.TotalCredito = ventas.Where(v => v.Tipo.Trim() == "Crédito").Sum(v => v.MontoTotal);
+            ViewBag.Ventas = ventas;
+
+            return View();
         }
     }
 }

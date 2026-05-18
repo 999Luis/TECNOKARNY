@@ -27,7 +27,6 @@ namespace TECNOKARNY.Controllers
         public async Task<IActionResult> Principal()
         {
             return View(await db.Usuarios.Include(x => x.IdRolNavigation).ToListAsync());
-
         }
 
         [Authorize(Roles = "Administrador")]
@@ -36,20 +35,27 @@ namespace TECNOKARNY.Controllers
             ViewBag.IdRol = new SelectList(db.Roles.ToList(), "Id", "Rol");
             return View();
         }
+
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear(Usuarios user)
         {
+            ModelState.Remove("IdRolNavigation");
+            ModelState.Remove("Cotizaciones");
+            ModelState.Remove("Pagos");
+            ModelState.Remove("Ventas");
+
             if (!ModelState.IsValid)
             {
+                ViewBag.IdRol = new SelectList(db.Roles.ToList(), "Id", "Rol");
                 return View(user);
             }
 
             bool correoExiste = await db.Usuarios.AnyAsync(u => u.Correo.ToLower() == user.Correo.ToLower().Trim());
-
             if (correoExiste)
             {
                 ModelState.AddModelError("Correo", "Este correo electrónico ya se encuentra registrado.");
-
+                ViewBag.IdRol = new SelectList(db.Roles.ToList(), "Id", "Rol");
                 return View(user);
             }
 
@@ -78,13 +84,15 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Actualizar(Usuarios usr)
         {
-            var usuarioElegido = await db.Usuarios.FindAsync(usr.Id);
-            if (usuarioElegido == null)
-            {
-                return NotFound();
-            }
+            ModelState.Remove("Pwd");
+            ModelState.Remove("IdRolNavigation");
+            ModelState.Remove("Cotizaciones");
+            ModelState.Remove("Pagos");
+            ModelState.Remove("Ventas");
+
             bool correoExiste = await db.Usuarios.AnyAsync(u => u.Correo.ToLower() == usr.Correo.ToLower().Trim() && u.Id != usr.Id);
             if (correoExiste)
             {
@@ -97,6 +105,9 @@ namespace TECNOKARNY.Controllers
                 return View(usr);
             }
 
+            var usuarioElegido = await db.Usuarios.FindAsync(usr.Id);
+            if (usuarioElegido == null) return NotFound();
+
             usuarioElegido.Nombre = usr.Nombre;
             usuarioElegido.Correo = usr.Correo.ToLower().Trim();
             usuarioElegido.IdRol = usr.IdRol;
@@ -107,6 +118,7 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Eliminar(byte Id)
         {
             var user = await db.Usuarios.FindAsync(Id);
@@ -121,17 +133,20 @@ namespace TECNOKARNY.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Perfil()
         {
             var userId = byte.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
             var usuario = db.Usuarios
-        .Include(u => u.IdRolNavigation)
-        .FirstOrDefault(u => u.Id == userId);
+                .Include(u => u.IdRolNavigation)
+                .FirstOrDefault(u => u.Id == userId);
+
+            if (usuario == null) return NotFound();
 
             var vm = new PerfilViewModel
             {
-                Nombre = usuario!.Nombre,
+                Nombre = usuario.Nombre,
                 Correo = usuario.Correo,
                 Rol = usuario.IdRolNavigation.Rol
             };
@@ -139,12 +154,14 @@ namespace TECNOKARNY.Controllers
             return View(vm);
         }
 
+        [Authorize]
         public IActionResult CambiarPassword()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult CambiarPassword(CambiarPasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -154,12 +171,9 @@ namespace TECNOKARNY.Controllers
 
             var usuario = db.Usuarios.Find(userId);
 
-            var ps = new PasswordHelper();
+            if (usuario == null) return NotFound();
 
-            if (usuario == null)
-            {
-                return NotFound();
-            }
+            var ps = new PasswordHelper();
 
             var valido = ps.VerifyPassword(
                 usuario,

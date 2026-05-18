@@ -5,17 +5,16 @@
     <div class="row mt-3">
         <div class="col-md-6">
             <div>
-                <label asp-for="Nombre"></label>
-                <input asp-for="Nombre" class="form-control" readonly/>
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+                <label asp-for="Nombre">Nombre:</label>
+                <span ><strong>@Model.Nombre</strong></span>
             </div>
         </div>
     </div>
     <div class="row mt-3">
         <div class="col-md-6">
             <div>
-                <label asp-for="ApePat"></label>
-                <input asp-for="ApePat" class="form-control" />
+                <label asp-for="ApePat">Apellido Paterno:</label>
+                <span ><strong>@Model.ApePat</strong></span>
                 <span asp-validation-for="ApePat" class="text-danger"></span>
             </div>
         </div>
@@ -23,8 +22,8 @@
     <div class="row mt-3">
         <div class="col-md-6">
             <div>
-                <label asp-for="ApeMat"></label>
-                <input asp-for="ApeMat" class="form-control" />
+                <label asp-for="ApeMat">Apellido Materno:</label>
+                <span ><strong>@Model.ApeMat</strong></span>
                 <span asp-validation-for="ApeMat" class="text-danger"></span>
             </div>
         </div>
